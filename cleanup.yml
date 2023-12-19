@@ -1,28 +1,34 @@
-- name: Cleanup
-  # TODO: change to remote if you have one
-  hosts: local
-  become: true
+---
+- hosts: your_target_servers
+  become: yes
   tasks:
-    - name: Remove packages
-      apt:
-        name: "{{ item }}"
-        state: absent
-      loop: "{{ packages }}"
-    - name: Stop sample.service
-      ansible.builtin.systemd:
-        name: sample.service
+    - name: Stop and disable the app service
+      systemd:
+        name: app
         state: stopped
         enabled: no
-    - name: Remove sample.service
-      ansible.builtin.file:
-        path: /etc/systemd/system/sample.service
+
+    - name: Remove app service file
+      file:
+        path: "/etc/systemd/system/app.service"
         state: absent
-    - name: Reload Systemd
-      ansible.builtin.systemd:
-        daemon_reload: yes
-    - name: Force delete Unit
-      ansible.builtin.shell: systemctl reset-failed
-    - name: Remove {{ app_dir }}/{{ app_file }}
-      ansible.builtin.file:
-        path: "{{ app_dir }}/{{ app_file }}"
+
+    - name: Remove Java app directory
+      file:
+        path: "{{ app_dir }}"
+        state: absent
+
+    - name: Remove Nginx configuration file
+      file:
+        path: "/etc/nginx/nginx.conf"
+        state: absent
+
+    - name: Remove Nginx package
+      apt:
+        name: nginx
+        state: absent
+
+    - name: Remove Java package
+      apt:
+        name: openjdk-11-jre
         state: absent
