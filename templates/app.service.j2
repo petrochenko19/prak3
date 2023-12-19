@@ -1,15 +1,12 @@
-{#
-TODO: reuse your unit from Lab 1
-TODO: Path to jar should use variables {{ app_dir }}/{{ app_file }}
-TODO: Environment variable for PORT should use value from variable {{ app_port }}
-#}
 [Unit]
-Description=
-Requires=
-After=
+Description=Your Java App
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/java -jar {{ app_dir }}/{{ app_file | basename }}
+User=nobody
+Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-
-[Service]
-ExecStart=
